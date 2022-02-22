@@ -47,7 +47,20 @@ string lireString(istream& fichier)
 	return texte;
 }
 
-#pragma endregion//}
+#pragma endregion
+ostream& operator << (ostream& o, const Film& f){
+	 o << "Titre: " << f.titre << "\n"
+		<< "  Réalisateur: " << f.realisateur << "  Année :" << f.anneeSortie << "\n"
+		<< "  Recette: " << f.recette << "M$" << "\n"
+
+		<< "Acteurs:" << "\n";
+	for (const ListeActeurs* acteur : spanListeActeurs(f.acteurs)) {
+		o << "  " << acteur.nom << ", " << acteur.anneeNaissance << " " << acteur.sexe << "\n"
+			;
+	}	
+	return o;
+}
+//}
 
 //TODO: Une fonction pour ajouter un Film à une ListeFilms, le film existant déjà; on veut uniquement ajouter le pointeur vers le film existant.  Cette fonction doit doubler la taille du tableau alloué, avec au minimum un élément, dans le cas où la capacité est insuffisante pour ajouter l'élément.  Il faut alors allouer un nouveau tableau plus grand, copier ce qu'il y avait dans l'ancien, et éliminer l'ancien trop petit.  Cette fonction ne doit copier aucun Film ni Acteur, elle doit copier uniquement des pointeurs.
 //[
