@@ -54,8 +54,8 @@ ostream& operator << (ostream& o, const Film& f){
 		<< "  Recette: " << f.recette << "M$" << "\n"
 
 		<< "Acteurs:" << "\n";
-	for (const ListeActeurs* acteur : spanListeActeurs(f.acteurs)) {
-		o << "  " << acteur.nom << ", " << acteur.anneeNaissance << " " << acteur.sexe << "\n"
+	for (const Acteur* acteur : spanListeActeurs(f.acteurs)) {
+		o << "  " << acteur->nom << ", " << acteur->anneeNaissance << " " << acteur->sexe << "\n"
 			;
 	}	
 	return o;
@@ -109,7 +109,10 @@ void ListeFilms::enleverFilm(const Film* film)
 //TODO: Une fonction pour trouver un Acteur par son nom dans une ListeFilms, qui retourne un pointeur vers l'acteur, ou nullptr si l'acteur n'est pas trouvé.  Devrait utiliser span.
 //[
 // Voir la NOTE ci-dessous pourquoi Acteur* n'est pas const.  Noter que c'est valide puisque c'est la struct uniquement qui est const dans le paramètre, et non ce qui est pointé par la struct.
-span<Acteur*> spanListeActeurs(const ListeActeurs& liste) { return span(liste.elements, liste.nElements); }
+span<Acteur*> ListeActeurs::getSpan()
+{ 
+	return span(elements.get(), nElements); 
+}
 
 //NOTE: Doit retourner un Acteur modifiable, sinon on ne peut pas l'utiliser pour modifier l'acteur tel que demandé dans le main, et on ne veut pas faire écrire deux versions.
 Acteur* ListeFilms::trouverActeur(const string& nomActeur) const
@@ -154,11 +157,11 @@ Film* lireFilm(istream& fichier//[
 	film.realisateur = lireString(fichier);
 	film.anneeSortie = lireUint16(fichier);
 	film.recette = lireUint16(fichier);
-	film.acteurs.nElements = lireUint8(fichier);  //NOTE: Vous avez le droit d'allouer d'un coup le tableau pour les acteurs, sans faire de réallocation comme pour ListeFilms.  Vous pouvez aussi copier-coller les fonctions d'allocation de ListeFilms ci-dessus dans des nouvelles fonctions et faire un remplacement de Film par Acteur, pour réutiliser cette réallocation.
+	film.acteurs.setNElements(lireUint8(fichier));  //NOTE: Vous avez le droit d'allouer d'un coup le tableau pour les acteurs, sans faire de réallocation comme pour ListeFilms.  Vous pouvez aussi copier-coller les fonctions d'allocation de ListeFilms ci-dessus dans des nouvelles fonctions et faire un remplacement de Film par Acteur, pour réutiliser cette réallocation.
 	//[
 	Film* filmp = new Film(film); //NOTE: On aurait normalement fait le "new" au début de la fonction pour directement mettre les informations au bon endroit; on le fait ici pour que le code ci-dessus puisse être directement donné aux étudiants sans qu'ils aient le "new" déjà écrit.
 	cout << "Création Film " << film.titre << endl;
-	filmp->acteurs.elements = new Acteur * [filmp->acteurs.nElements];
+	filmp->acteurs.elements = new Acteur * [filmp->acteurs.setNElements()];
 	/*
 	//]
 	for (int i = 0; i < film.acteurs.nElements; i++) {

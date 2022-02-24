@@ -33,17 +33,23 @@ private:
 
 class ListeActeurs {
 public:
-	spanListeActeurs()
+	ListeActeurs() {}
+	ListeActeurs(int capacite) { /*make_unique*/ }
+	ListeActeurs(const ListeActeurs& copie){}
+	span<Acteur*>getSpan();
 	unique_ptr<Acteur* []> elements;
-	Acteur acteurs = make_unique<Acteur* []>(capacite);
+	void setNElements(int nombre) 
+	{ 
+		nElements = nombre; 
+	}
 private:
-	int capacite, nElements;
+	int capacite = 0, nElements = 0;
 };
 
 struct Film
 {
 	std::string titre, realisateur; // Titre et nom du réalisateur (on suppose qu'il n'y a qu'un réalisateur).
-	int anneeSortie, recette; // Année de sortie et recette globale du film en millions de dollars
+	int anneeSortie = 0, recette = 0; // Année de sortie et recette globale du film en millions de dollars
 	ListeActeurs acteurs;
 };
 
