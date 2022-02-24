@@ -91,7 +91,10 @@ void ListeFilms::ajouterFilm(Film* film)
 //TODO: Une fonction pour enlever un Film d'une ListeFilms (enlever le pointeur) sans effacer le film; la fonction prenant en paramètre un pointeur vers le film à enlever.  L'ordre des films dans la liste n'a pas à être conservé.
 //[
 // On a juste fait une version const qui retourne un span non const.  C'est valide puisque c'est la struct qui est const et non ce qu'elle pointe.  Ça ne va peut-être pas bien dans l'idée qu'on ne devrait pas pouvoir modifier une liste const, mais il y aurais alors plusieurs fonctions à écrire en version const et non-const pour que ça fonctionne bien, et ce n'est pas le but du TD (il n'a pas encore vraiment de manière propre en C++ de définir les deux d'un coup).
-span<Film*> ListeFilms::enSpan() const { return span(elements, nElements); }
+span<Film*> ListeFilms::enSpan() const 
+{ 
+	return span(elements, nElements); 
+}
 
 void ListeFilms::enleverFilm(const Film* film)
 {
@@ -109,7 +112,7 @@ void ListeFilms::enleverFilm(const Film* film)
 //TODO: Une fonction pour trouver un Acteur par son nom dans une ListeFilms, qui retourne un pointeur vers l'acteur, ou nullptr si l'acteur n'est pas trouvé.  Devrait utiliser span.
 //[
 // Voir la NOTE ci-dessous pourquoi Acteur* n'est pas const.  Noter que c'est valide puisque c'est la struct uniquement qui est const dans le paramètre, et non ce qui est pointé par la struct.
-span<Acteur*> ListeActeurs::getSpan()
+span<Acteur*> ListeActeurs::spanListeActeurs() 
 { 
 	return span(elements.get(), nElements); 
 }
@@ -118,7 +121,7 @@ span<Acteur*> ListeActeurs::getSpan()
 Acteur* ListeFilms::trouverActeur(const string& nomActeur) const
 {
 	for (const Film* film : enSpan()) {
-		for (Acteur* acteur : spanListeActeurs(film->acteurs)) {
+		for (Acteur* acteur : ListeActeurs::spanListeActeurs(film->acteurs)) {
 			if (acteur->nom == nomActeur)
 				return acteur;
 		}
@@ -161,13 +164,13 @@ Film* lireFilm(istream& fichier//[
 	//[
 	Film* filmp = new Film(film); //NOTE: On aurait normalement fait le "new" au début de la fonction pour directement mettre les informations au bon endroit; on le fait ici pour que le code ci-dessus puisse être directement donné aux étudiants sans qu'ils aient le "new" déjà écrit.
 	cout << "Création Film " << film.titre << endl;
-	filmp->acteurs.elements = new Acteur * [filmp->acteurs.setNElements()];
+	filmp->acteurs.elements = new Acteur * [filmp->acteurs.setNElements(10)];
 	/*
 	//]
 	for (int i = 0; i < film.acteurs.nElements; i++) {
 		//[
 	*/
-	for (Acteur*& acteur : spanListeActeurs(filmp->acteurs)) {
+	for (Acteur*& acteur : ListeActeurs::spanListeActeurs(filmp->acteurs)) {
 		acteur =
 			//]
 			lireActeur(fichier//[
@@ -232,7 +235,7 @@ bool joueEncore(const Acteur* acteur)
 }
 void detruireFilm(Film* film)
 {
-	for (Acteur* acteur : spanListeActeurs(film->acteurs)) {
+	for (Acteur* acteur : ListeActeurs::spanListeActeurs(film->acteurs)) {
 		acteur->joueDans.enleverFilm(film);
 		if (!joueEncore(acteur))
 			detruireActeur(acteur);
@@ -269,7 +272,7 @@ void afficherFilm(const Film& film)
 	cout << "  Recette: " << film.recette << "M$" << endl;
 
 	cout << "Acteurs:" << endl;
-	for (const Acteur* acteur : spanListeActeurs(film.acteurs))
+	for (const Acteur* acteur : ListeActeurs::spanListeActeurs(film.acteurs))
 		afficherActeur(*acteur);
 }
 //]

@@ -36,7 +36,7 @@ public:
 	ListeActeurs() {}
 	ListeActeurs(int capacite) { /*make_unique*/ }
 	ListeActeurs(const ListeActeurs& copie){}
-	span<Acteur*>getSpan();
+	span<Acteur*>spanListeActeurs();
 	unique_ptr<Acteur* []> elements;
 	void setNElements(int nombre) 
 	{ 
@@ -55,6 +55,6 @@ struct Film
 
 struct Acteur
 {
-	std::string nom; int anneeNaissance; char sexe;
+	std::string nom ="nom"; int anneeNaissance = 1900; char sexe = "M";
 	ListeFilms joueDans;
 };
